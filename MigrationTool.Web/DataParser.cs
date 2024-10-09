@@ -1,4 +1,7 @@
+using MigrationTool.Web.Constants;
+
 namespace MigrationTool.Web;
+
 public class DataParser
 {
     private Dictionary<string, string> parserDataObject = [];
@@ -17,46 +20,21 @@ public class DataParser
     }
     public void Execute(Dictionary<string, string> parserDataObject)
     {
-        string firstNameKeyIn = "p:namn/p:fornamn";
-        string lastNameKeyIn = "p:namn/p:efternamn";
-        string firstNameKeyOut = "Namn.fornamn";
-        string lastNameKeyOut = "Namn.efternamn";
-
-        bool hasFirstName = parserDataObject.TryGetValue(firstNameKeyIn, out string? firstNameValue) &&
+        bool hasFirstName = parserDataObject.TryGetValue(InputKeys.FirstName, out string? firstNameValue) &&
         !string.IsNullOrWhiteSpace(firstNameValue);
 
-        bool hasLastName = parserDataObject.TryGetValue(lastNameKeyIn, out string? lastNameValue) &&
+        bool hasLastName = parserDataObject.TryGetValue(InputKeys.LastName, out string? lastNameValue) &&
         !string.IsNullOrWhiteSpace(lastNameValue);
 
         if (!hasFirstName && !hasLastName)
         {
-            parserDataObject[firstNameKeyOut] = "Namn";
-            parserDataObject[lastNameKeyOut] = "saknas";
-            return;
+            parserDataObject[OutputKeys.FirstName] = "Namn";
+            parserDataObject[OutputKeys.LastName] = "saknas";
         }
-
-        // no first name but last name exists
-        if (!hasFirstName && hasLastName)
+        else
         {
-            parserDataObject[firstNameKeyOut] = string.Empty;
-            parserDataObject[lastNameKeyOut] = lastNameValue!;
-            return;
-        }
-
-        // no last name but first name exists
-        if (hasFirstName && !hasLastName)
-        {
-            parserDataObject[firstNameKeyOut] = firstNameValue!;
-            parserDataObject[lastNameKeyOut] = "Efternamn saknas";
-            return;
-        }
-
-        // both first name and last name exists, use existing values
-        if (hasFirstName && hasLastName)
-        {
-            parserDataObject[firstNameKeyOut] = firstNameValue!;
-            parserDataObject[lastNameKeyOut] = lastNameValue!;
-            return;
+            parserDataObject[OutputKeys.FirstName] = hasFirstName ? firstNameValue! : string.Empty;
+            parserDataObject[OutputKeys.LastName] = hasLastName ? lastNameValue! : "Efternamn saknas";
         }
     }
 }
