@@ -16,9 +16,9 @@ public class DataParser
     }
     public void SetValue(string key, string value)
     {
-        parserDataObject.Add(key, value);
+        parserDataObject[key] = value; // Skriver över om nyckel redan finns, alt. TryAdd
     }
-    public void Execute(Dictionary<string, string> parserDataObject)
+    public void Execute() // parserDataObject tillgängligt i scopet, behövs ej i signaturen
     {
         bool hasFirstName = parserDataObject.TryGetValue(InputKeys.FirstName, out string? firstNameValue) &&
         !string.IsNullOrWhiteSpace(firstNameValue);
@@ -29,7 +29,7 @@ public class DataParser
         if (!hasFirstName && !hasLastName)
         {
             parserDataObject[OutputKeys.FirstName] = "Namn";
-            parserDataObject[OutputKeys.LastName] = "saknas";
+            parserDataObject[OutputKeys.LastName] = "Saknas";
         }
         else
         {
