@@ -9,7 +9,7 @@ public class Seeder
     public static void Init()
     {
         List<Entities.Person> personSeedData = GeneratePersons(100);
-        CreateXmlFile(personSeedData);
+        CreateXmlFiles(personSeedData);
     }
 
     static List<Entities.Person> GeneratePersons(int count)
@@ -45,48 +45,47 @@ public class Seeder
             return name;
     }
 
-    static void CreateXmlFile(List<Entities.Person> persons)
+    static void CreateXmlFiles(List<Entities.Person> persons)
     {
-        XmlDocument doc = new XmlDocument();
-
-        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-        doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
-
-        XmlElement rootElement;
-        rootElement = doc.CreateElement("p", "root", "http://www.test.data/xml/person");
-        doc.AppendChild(rootElement);
-
-        XmlComment comment = doc.CreateComment("Root element content goes here");
-        rootElement.AppendChild(comment);
-
         foreach (var person in persons)
         {
+            XmlDocument doc = new XmlDocument();
+
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
+
             XmlElement personElement = doc.CreateElement("p", "person", "http://www.test.data/xml/person");
 
             XmlElement uuidElement = doc.CreateElement("p", "uuid", "http://www.test.data/xml/person");
             uuidElement.InnerText = person.Uuid.ToString();
             personElement.AppendChild(uuidElement);
-            
-            
+
             XmlElement namnElement = doc.CreateElement("p", "namn", "http://www.test.data/xml/person");
 
-            if (!string.IsNullOrWhiteSpace(person.GivenName))
+            if (person.GivenName != null)
             {
                 XmlElement fornamnElement = doc.CreateElement("p", "fornamn", "http://www.test.data/xml/person");
                 fornamnElement.InnerText = person.GivenName;
                 namnElement.AppendChild(fornamnElement);
             }
 
-            if (!string.IsNullOrWhiteSpace(person.FamilyName))
+            if (person.FamilyName != null)
             {
                 XmlElement efternamnElement = doc.CreateElement("p", "efternamn", "http://www.test.data/xml/person");
                 efternamnElement.InnerText = person.FamilyName;
                 namnElement.AppendChild(efternamnElement);
             }
+
             personElement.AppendChild(namnElement);
-            
-            rootElement.AppendChild(personElement);
+
+            doc.AppendChild(personElement);
+
+            string directoryPath = ".appdata/";
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+
+            string fileName = Path.Combine(directoryPath, $"{person.Uuid}.xml"); ;
+            doc.Save(fileName);
         }
-        doc.Save("data.xml");
     }
 }
