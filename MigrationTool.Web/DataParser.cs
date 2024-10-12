@@ -6,35 +6,33 @@ public class DataParser
 {
     private Dictionary<string, string> parserDataObject = [];
 
-    public object? GetValue(string key)
+    public string? GetValue(string key) // Nullable sträng smidigare
     {
         if (parserDataObject.TryGetValue(key, out string? value))
-        {
             return value;
-        }
+
         return null;
     }
+
     public void SetValue(string key, string value)
     {
-        parserDataObject[key] = value; // Skriver över om nyckel redan finns, alt. TryAdd
+        parserDataObject[key] = value;
     }
-    public void Execute() // parserDataObject tillgängligt i scopet, behövs ej i signaturen
+
+    public void Execute()
     {
-        bool hasFirstName = parserDataObject.TryGetValue(InputKeys.FirstName, out string? firstNameValue) &&
-        !string.IsNullOrWhiteSpace(firstNameValue);
+        string? firstName = GetValue(InputKeys.FirstName);
+        string? lastName = GetValue(InputKeys.LastName);
 
-        bool hasLastName = parserDataObject.TryGetValue(InputKeys.LastName, out string? lastNameValue) &&
-        !string.IsNullOrWhiteSpace(lastNameValue);
-
-        if (!hasFirstName && !hasLastName)
+        if (string.IsNullOrWhiteSpace(firstName) && string.IsNullOrWhiteSpace(lastName))
         {
-            parserDataObject[OutputKeys.FirstName] = "Namn";
-            parserDataObject[OutputKeys.LastName] = "Saknas";
+            SetValue(OutputKeys.FirstName, "Namn");
+            SetValue(OutputKeys.LastName, "saknas");
         }
         else
         {
-            parserDataObject[OutputKeys.FirstName] = hasFirstName ? firstNameValue! : string.Empty;
-            parserDataObject[OutputKeys.LastName] = hasLastName ? lastNameValue! : "Efternamn saknas";
+            SetValue(OutputKeys.FirstName, string.IsNullOrWhiteSpace(firstName) ? string.Empty: firstName);
+            SetValue(OutputKeys.LastName, string.IsNullOrWhiteSpace(lastName) ? "Efternamn saknas" : lastName);
         }
     }
 }

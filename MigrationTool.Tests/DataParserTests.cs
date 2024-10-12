@@ -12,107 +12,107 @@ public class DataParserTests
     public void ParseData_MissingInputKeys_ShoudSetDefaultOutputValues()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>();
         var dataParser = new DataParser();
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal("Namn", parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("saknas", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal("Namn", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("saknas", dataParser.GetValue(OutputKeys.LastName));
     }
     // Case B: Nycklarna finns, men null
     [Fact]
     public void ParseData_NullInputKeys_ShoudSetDefaultOutputValues()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>
-        {
-            { InputKeys.FirstName, null! },
-            { InputKeys.LastName, null! }
-        };
         var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.FirstName, null!);
+        dataParser.SetValue(InputKeys.LastName, null!);
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal("Namn", parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("saknas", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal("Namn", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("saknas", dataParser.GetValue(OutputKeys.LastName));
     }
-    // Case B: Nycklarna finns, men tomma
+    // Case C: Nycklarna finns, men tomma
+    [Fact]
+    public void ParseData_EmptyInputKeys_ShoudSetDefaultOutputValues()
+    {
+        // Arrange
+        var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.FirstName, "");
+        dataParser.SetValue(InputKeys.LastName, "");
+
+        // Act
+        dataParser.Execute();
+
+        // Assert
+        Assert.Equal("Namn", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("saknas", dataParser.GetValue(OutputKeys.LastName));
+    }
+    // Case D: Nycklarna finns, men whitespace
     [Fact]
     public void ParseData_WhiteSpaceInputKeys_ShoudSetDefaultOutputValues()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>
-        {
-            { InputKeys.FirstName, "" },
-            { InputKeys.LastName, "" }
-        };
         var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.FirstName, " ");
+        dataParser.SetValue(InputKeys.LastName, " ");
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal("Namn", parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("saknas", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal("Namn", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("saknas", dataParser.GetValue(OutputKeys.LastName));
     }
     // Om bara förnamn saknas ska förnamn bli tomma strängen och efternamnet bli det angivna efternamnet. 
     [Fact]
     public void ParseData_OnlyLastNameExists_ShouldSetFirstNameToEmptyAndLastNameToLastName()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>
-        {
-            { InputKeys.LastName, "Pakola" }
-        };
         var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.LastName, "Testsson");
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal(string.Empty, parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("Pakola", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal(string.Empty, dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("Testsson", dataParser.GetValue(OutputKeys.LastName));
     }
     // Om efternamnet saknas ska förnamnet bli det angivna förnamnet, och efternamnet bli "Efternamn saknas". 
     [Fact]
     public void ParseData_OnlyFirstNameExists_ShouldSetLastNameToMissing()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>
-        {
-            { InputKeys.FirstName, "Håkan" }
-        };
         var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.FirstName, "Håkan");
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal("Håkan", parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("Efternamn saknas", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal("Håkan", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("Efternamn saknas", dataParser.GetValue(OutputKeys.LastName));
     }
     // Om båda finns ska båda anges rakt av.
     [Fact]
     public void ParseData_BothNamesExist_ShouldSetBothNamesDirectly()
     {
         // Arrange
-        var parserDataObject = new Dictionary<string, string>
-        {
-            { InputKeys.FirstName, "Håkan" },
-            { InputKeys.LastName, "Bråkan" }
-        };
         var dataParser = new DataParser();
+        dataParser.SetValue(InputKeys.FirstName, "Håkan");
+        dataParser.SetValue(InputKeys.LastName, "Bråkan");
 
         // Act
-        dataParser.Execute(parserDataObject);
+        dataParser.Execute();
 
         // Assert
-        Assert.Equal("Håkan", parserDataObject[OutputKeys.FirstName]);
-        Assert.Equal("Bråkan", parserDataObject[OutputKeys.LastName]);
+        Assert.Equal("Håkan", dataParser.GetValue(OutputKeys.FirstName));
+        Assert.Equal("Bråkan", dataParser.GetValue(OutputKeys.LastName));
     }
 }
